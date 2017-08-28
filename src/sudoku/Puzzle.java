@@ -266,6 +266,9 @@ class Puzzle
 		return false;
 	}
 	private static Random rnd = ThreadLocalRandom.current();
+	static void setRandomSeed(long seed) {
+		rnd.setSeed(seed);
+	}
 	private static void shuffleArray(int[] ar)
 	{
 		for (int i = ar.length - 1; i > 0; i--)

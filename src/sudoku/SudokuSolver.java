@@ -8,38 +8,8 @@ import java.util.function.Function;
 
 class SudokuSolver
 {
-	public static void main(String[] args) throws Exception
-	{
-		/*
-		 * BufferedReader reader = new BufferedReader(new
-		 * InputStreamReader(System.in)); String line;
-		 * while((line=reader.readLine())!=null) { Collection<String> solutions
-		 * = SudokuSolver.getAllSolutions(line);
-		 * System.out.println(solutions.size()); for(String p : solutions)
-		 * System.out.println(formatPuzzle(p)); } System.exit(0);
-		 */
-		for(int i=1;i<=36;++i)
-		{
-			System.out.print("f(");
-			if(i<10)
-				System.out.print(' ');
-			System.out.print(i+") = ");
-			System.out.println(getSolutionCount(new Puzzle(i)));
-			System.gc();
-		}
-		/*
-		final int size = 36;
-		Puzzle puzzle = new Puzzle(size);
-		System.out.println(puzzle.toString());
-		System.out.println(puzzle.toFormattedString());
-		System.out.println(SudokuSolver.solve(puzzle).toFormattedString());
-		System.exit(0);
-		System.out.println(SudokuSolver.getSolutionCount(puzzle));
-		// System.exit(0);
-		SudokuSolver.iterateSolutions(puzzle, (p)->{
-			System.out.println(p.toFormattedString());
-		})*/;
-	}
+	private SudokuSolver(){}
+	
 	public static String solve(String puzzle){
 		return solve(new Puzzle(puzzle)).toString();
 	}

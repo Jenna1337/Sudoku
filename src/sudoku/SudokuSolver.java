@@ -59,7 +59,7 @@ class SudokuSolver
 		pzl = p;
 		throw new FoundSolutionException();
 	}
-	private static Puzzle solve(Puzzle puzzle)
+	static Puzzle solve(Puzzle puzzle)
 	{
 		try
 		{

@@ -8,18 +8,18 @@ import java.util.concurrent.ThreadLocalRandom;
 
 class Puzzle
 {
-	private static final int maxsize = 36,//215,
-		maxwallsize = maxsize*maxsize;
+	static final int MAXSIZE = 6;
+	private static final int maxwallsize = MAXSIZE*MAXSIZE;
 	private static final char basechar = '\u2800';
-	private static final boolean ciUseBackup = true;
+	private static final boolean ciUseBackup = false;
 	private static final char empty = '0';
 	private static final char[] charsToUse = {
 		' ', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
 		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-		'u', 'v', 'w', 'x', 'y', 'z'
+		'u', 'v', 'w', 'x', 'y', 'z','&'
 	};
-	private static HashMap<Character, Integer> charIntMap = new HashMap<>(maxsize);
+	private static HashMap<Character, Integer> charIntMap = new HashMap<>(MAXSIZE);
 	static{
 		for(int i=0;i<charsToUse.length;++i)
 			charIntMap.put(charsToUse[i], i);
@@ -107,7 +107,7 @@ class Puzzle
 	}
 	private static Map<Integer, PuzzleStaticCache> varCache = new HashMap<Integer, PuzzleStaticCache>();
 	private PuzzleStaticCache vars;
-	private final int wallsize;
+	private final int puzzlesize;
 	private ArrayList<Cell> cells;
 	
 	
@@ -128,18 +128,18 @@ class Puzzle
 		puzzle = puzzle.replaceAll("\\s+", "");
 		{
 			double sq = Math.pow(puzzle.length(), 0.25);
-			wallsize = (int)sq;
-			if(wallsize>maxwallsize)
+			puzzlesize = (int)sq;
+			if(puzzlesize>maxwallsize)
 				throw new IllegalArgumentException(
 					"Puzzle String \"" + puzzle + "\" is too long; " + puzzle.length());
-			if (sq - wallsize != 0)
+			if (sq - puzzlesize != 0)
 				throw new IllegalArgumentException(
 					"Puzzle String \"" + puzzle + "\" is an invalid length; " + puzzle.length());
 		}
-		if (varCache.containsKey(wallsize))
-			vars = varCache.get(wallsize);
+		if (varCache.containsKey(puzzlesize))
+			vars = varCache.get(puzzlesize);
 		else
-			varCache.put(wallsize, vars = new PuzzleStaticCache(wallsize));
+			varCache.put(puzzlesize, vars = new PuzzleStaticCache(puzzlesize));
 		
 		if (puzzle.length() != vars.cellcount)
 			throw new IllegalArgumentException("Puzzle String \"" + puzzle + "\" is not the correct length; "
@@ -150,7 +150,7 @@ class Puzzle
 	}
 	public Puzzle(Puzzle toCopy)
 	{
-		this.wallsize = toCopy.wallsize;
+		this.puzzlesize = toCopy.puzzlesize;
 		this.vars = toCopy.vars;
 		this.cells = new ArrayList<Cell>(toCopy.cells.size());
 		for (Cell c : toCopy.cells)
@@ -267,7 +267,10 @@ class Puzzle
 	}
 	private static Random rnd = ThreadLocalRandom.current();
 	static void setRandomSeed(long seed) {
-		rnd.setSeed(seed);
+		if(rnd.getClass().isAssignableFrom(ThreadLocalRandom.class))
+			rnd = new Random(seed);
+		else
+			rnd.setSeed(seed);
 	}
 	private static void shuffleArray(int[] ar)
 	{
@@ -346,9 +349,9 @@ class Puzzle
 		return ThreadLocalRandom.current().nextInt(max + 1);
 	}
 	private static char toChar(int val){
-		return ciUseBackup ? charsToUse[val] : (char)(basechar+val);
+		return ciUseBackup ? (char)(basechar+val) : charsToUse[val];
 	}
 	private static int parseChar(char val){
-		return val==empty ? 0 : (ciUseBackup ? val-basechar : charIntMap.get(val));
+		return val==empty ? 0 : (ciUseBackup ? (val-basechar) : charIntMap.get(val));
 	}
 }

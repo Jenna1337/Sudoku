@@ -32,7 +32,7 @@ public class Sudoku
 	{
 		return new Sudoku(size, mode_random | mode_solved);
 	}
-	private static final boolean multithreaded = true;
+	private static final boolean multithreaded = false;
 	public static void printEveryPossibleValidCombinationCount(){
 		printEveryPossibleValidCombinationCount(false);
 	}

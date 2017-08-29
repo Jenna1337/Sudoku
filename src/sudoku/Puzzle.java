@@ -125,7 +125,7 @@ class Puzzle
 	int[] shuffledIndexes;
 	public Puzzle(String puzzle)
 	{
-		puzzle = puzzle.replaceAll("\\s+", "");
+		//puzzle = puzzle.replaceAll("\\s+", "");
 		{
 			double sq = Math.pow(puzzle.length(), 0.25);
 			puzzlesize = (int)sq;
@@ -348,10 +348,10 @@ class Puzzle
 	private static int random(final int max){
 		return ThreadLocalRandom.current().nextInt(max + 1);
 	}
-	private static char toChar(int val){
+	static char toChar(int val){
 		return ciUseBackup ? (char)(basechar+val) : charsToUse[val];
 	}
-	private static int parseChar(char val){
+	static int parseChar(char val){
 		return val==empty ? 0 : (ciUseBackup ? (val-basechar) : charIntMap.get(val));
 	}
 }

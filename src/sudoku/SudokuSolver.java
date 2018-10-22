@@ -78,7 +78,7 @@ class SudokuSolver
 	private static void solveWithCallback(Puzzle p, final boolean loopForever, final Function<Puzzle, Boolean> checkIfDone,
 		final Consumer<Puzzle> onSolved, final Consumer<Puzzle> onDone)
 	{
-		new Solver(loopForever, checkIfDone, onSolved, onDone, null).solve(p);
+		new BruteForcer(loopForever, checkIfDone, onSolved, onDone, null).accept(p);
 	}
 	public static BigInteger getSolutionCountMultithreaded(Puzzle puzzle)
 	{
@@ -108,7 +108,7 @@ class SudokuSolver
 			if(pu.test() && pu.isNotSolved()) {
 				final Puzzle puco = new Puzzle(pu);
 				Thread t = new Thread(threadGroup, ()->{
-					new Solver(loopForever, checkIfDone, onSolved, onDone, threadStarter).solve(puco);
+					new BruteForcer(loopForever, checkIfDone, onSolved, onDone, threadStarter).accept(puco);
 				});
 				t.start();
 			}
@@ -116,7 +116,7 @@ class SudokuSolver
 		};
 		try
 		{
-			new Solver(loopForever, checkIfDone, onSolved, onDone, threadStarter).solve(p);
+			new BruteForcer(loopForever, checkIfDone, onSolved, onDone, threadStarter).accept(p);
 		}
 		catch(IllegalArgumentException e)
 		{
@@ -148,73 +148,5 @@ class SudokuSolver
 		
 		System.out.print(solutionCount+", ");
 		Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
-	}
-	private static class Solver
-	{
-		private final boolean loopForever0;
-		private final Function<Puzzle, Boolean> checkIfDone0;
-		private final Consumer<Puzzle> onSolved0, onDone0;
-		private final Consumer<Puzzle> onAssumeSuccess0;
-		
-		Solver(final boolean loopForever, final Function<Puzzle, Boolean> checkIfDone,
-			final Consumer<Puzzle> onSolved, final Consumer<Puzzle> onDone, final Consumer<Puzzle> onAssumeSuccess)
-		{
-			this.loopForever0=loopForever;
-			this.checkIfDone0=checkIfDone;
-			this.onSolved0=onSolved;
-			this.onDone0=onDone;
-			this.onAssumeSuccess0=onAssumeSuccess;
-		}
-		public void solve(Puzzle p)
-		{
-			try
-			{
-				solve0(p);
-			}
-			catch (IllegalArgumentException e)
-			{
-			}
-		}
-		private void solve0(Puzzle p)
-		{
-			int attempts = 0;
-			while (loopForever0 || checkIfDone0.apply(p))
-			{
-				if (!p.test())
-					throw new IllegalArgumentException("The puzzle is not valid");
-				Puzzle save = new Puzzle(p);
-				while (!p.update())
-				{
-					if (p.isSolved())
-						onSolved0.accept(p);
-					attempts++;
-					switch (p.assume(attempts))
-					{
-						case Puzzle.SUCCESS:
-						{
-							try{
-								if(onAssumeSuccess0!=null)
-									onAssumeSuccess0.accept(p);
-								solve0(p);
-							}
-							catch (IllegalArgumentException iae)
-							{
-								p = new Puzzle(save);
-								System.gc();
-								continue;
-							}
-						}
-						case Puzzle.INVALID:
-							throw new IllegalArgumentException("The puzzle is not valid");
-						case Puzzle.FAILED:
-							throw new IllegalArgumentException("No more data to assume "+save);
-						default:
-							throw new InternalError();
-					}
-				}
-			}
-			System.gc();
-			onDone0.accept(p);
-		}
 	}
 }

@@ -82,10 +82,4 @@ public class Sudoku
 	public String toString() {
 		return p.toFormattedString();
 	}
-	
-	@Deprecated
-	private static String formatPuzzle(String puzzle)
-	{
-		return new Puzzle(puzzle).toFormattedString();
-	}
 }

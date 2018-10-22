@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import static sudoku.Assumption.*;
+import static sudoku.Assumption.Mode.*;
+import static sudoku.Assumption.Response.*;
 
 class Puzzle
 {
@@ -220,9 +223,26 @@ class Puzzle
 	{
 		return this.toString().replaceFirst(vars.formatMatch, vars.formatReplacement);
 	}
-	static final int SUCCESS = 1, INVALID = -1, FAILED = 0;
-	int assume(int choice)
+	@Deprecated
+	Response assume(int choice) {
+		return assume(choice, DEFAULT);
+	}
+	Response assume(int choice, Assumption.Mode mode)
 	{
+		switch(mode) {
+			case BACKWARD:
+				break;
+			case RANDOM:
+				return assumeRandomUnsolved()
+					? SUCCESS : FAILED;
+			case FORWARD:
+			case DEFAULT:
+			default:
+				return assumeForward(choice);
+		}
+		return FAILED;
+	}
+	Response assumeForward(int choice) {
 		choice -= 1;
 		for (int k = 0; k < vars.cellcount; ++k)
 		{
@@ -255,10 +275,10 @@ class Puzzle
 		for(int randomIndex : shuffledIndexes)
 			switch(cells.get(randomIndex).assumeRandom())
 			{
-				case Puzzle.SUCCESS:
+				case SUCCESS:
 					return true;
-				case Puzzle.FAILED:
-				case Puzzle.INVALID:
+				case FAILED:
+				case INVALID:
 					continue;
 				default:
 					throw new InternalError();
@@ -319,7 +339,7 @@ class Puzzle
 				throw new IllegalStateException();
 			return possibilities.get(0);
 		}
-		public int assume(int choice)
+		public Response assume(int choice)
 		{
 			if (!isSolved())
 			{
@@ -332,7 +352,7 @@ class Puzzle
 			}
 			return FAILED;
 		}
-		public int assumeRandom()
+		public Response assumeRandom()
 		{
 			return assume(random(possibilities.size()));
 		}
